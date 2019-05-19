@@ -1,0 +1,125 @@
+.container--main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 100vh;
+}
+
+.table {
+  position: relative;
+  display: flex;
+  margin: 0 auto;
+  padding: 50px 100px;
+
+  .container--table {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 80px;
+    width: 900px;
+    background: #090;
+    border-radius: 200px;
+    border: 5px solid #b39118;
+
+    .card {
+      width: 150px;
+      height: 218px;
+      box-shadow: 0 0 0 transparent;
+      border-radius: 5px;
+      margin: 0 10px;
+    }
+  }
+
+  .container--personSeats {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+
+    .playerSeat {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+
+      .step-icon {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        background: #f00;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+      }
+
+      &:nth-child(even) {
+        margin: 0 0 0 auto;
+
+        .step-icon {
+            right: -10px;
+            left: auto;
+        }
+      }
+
+
+      .text--name {
+        font-size: 2em;
+        font-weight: bold;
+      }
+
+      .text-money {
+        color: #e00;
+      }
+
+      .checker--betStatus {
+        margin-top: 10px;
+        margin-right: auto;
+        padding: 5px;
+        color: #eee;
+        background: rgba(0, 0, 0, 0.25);
+        border-radius: 5px;
+      }
+    }
+  }
+}
+
+.container--hand {
+  display: flex;
+  justify-content: center;
+}
+.container--myCards {
+  display: flex;
+  justify-content: space-around;
+  width: 400px;
+  margin: 0 100px;
+
+  .card {
+    width: 150px;
+    height: 218px;
+    box-shadow: 0 0 0 transparent;
+    border-radius: 5px;
+  }
+}
+
+.container--myControls {
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+
+  .btns--controls button {
+    margin: 0 10px;
+    padding: 5px 15px;
+    color: #eee;
+    font-size: 2em;
+    background: #999;
+    border-radius: 5px;
+    border: none;
+  }
+  
+  .btns--controls.active button {
+    background: #ff4a4a;
+  }
+}
