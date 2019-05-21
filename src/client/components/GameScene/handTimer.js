@@ -26,11 +26,14 @@ class HandTimer extends Component {
 
   render() {
     const { timerTick } = this.state;
-    return (
-      <span>
-        {timerTick}
-      </span>
-    );
+    if (timerTick >= 0) {
+      return (
+        <span>
+          {timerTick}
+        </span>
+      );
+    }
+    return (<span>Either Disconnect or No session Player</span>);
   }
 }
 

@@ -2,11 +2,13 @@ function prepareDataToSend(gameState, connectionId, maxSessionUser) {
   if (gameState) {
     // encapsulation players data
 
-    const privatePlayersData = gameState.playersData.map((playerData) => {
-      if (Number(connectionId) !== playerData.id) {
-        const privatePlayerData = Object.assign({}, playerData);
-        delete privatePlayerData.hand;
-        return privatePlayerData;
+    const privatePlayersData = gameState.playersData.map((playerData, seatId) => {
+      if (playerData) {
+        if (Number(connectionId) !== seatId) {
+          const privatePlayerData = Object.assign({}, playerData);
+          delete privatePlayerData.hand;
+          return privatePlayerData;
+        }
       }
       return playerData;
     });

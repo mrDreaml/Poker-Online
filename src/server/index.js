@@ -14,12 +14,11 @@ const app = express();
 require('express-ws')(app);
 const login = require('./login/login');
 const session = require('./session/session');
-const addConnection = require('./entity/addConnection');
 
 const connectedUser = [];
 connectedUser.maxSessionUser = 5;
 
-login(app, newUser => addConnection(connectedUser, newUser));
+login(app, connectedUser);
 session(app, connectedUser);
 
 const port = 9000;
@@ -30,3 +29,10 @@ app.use(fallback('index.html', { root }));
 app.listen(process.env.PORT || port, () => {
   console.log(`Listening on port ${process.env.PORT || port}!`);
 });
+
+
+/* 
+  1.  Poker Combos Calculations
+  2. fix: after fold on end game winner don't get money
+  3.  login
+  */

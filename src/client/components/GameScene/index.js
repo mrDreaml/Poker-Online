@@ -20,6 +20,7 @@ class GameScene extends Component {
       playersData: [],
       stepTime: null,
     };
+
     const inputState = props.location.state;
     if (inputState) {
       this.connectionId = inputState.connectionId;
@@ -28,15 +29,15 @@ class GameScene extends Component {
     }
 
     this.myPlayerSeatId = 3;
+    const { host } = window.location;
+    this.sessionGameState = new WebSocket(`ws://${host}/session/${this.connectionId}`);
 
     this.handHandlerRaise = handHandlerRaise.bind(this);
     this.handHandlerAction = handHandlerAction.bind(this);
   }
 
   componentWillMount() {
-    const { host } = window.location;
-    const sessionGameState = new WebSocket(`ws://${host}/session/${this.connectionId}`);
-    sessionGameState.addEventListener('message', (event) => {
+    this.sessionGameState.addEventListener('message', (event) => {
       const gameState = JSON.parse(event.data);
       if (gameState) {
         this.setState(prepareGameState.call(this, gameState));
@@ -44,6 +45,12 @@ class GameScene extends Component {
     });
   }
 
+  componentDidMount() {
+    window.onbeforeunload = () => {
+      this.sessionGameState.close();
+      return false;
+    };
+  }
 
   render() {
     const { playersData, currentStep, stepTime } = this.state;
