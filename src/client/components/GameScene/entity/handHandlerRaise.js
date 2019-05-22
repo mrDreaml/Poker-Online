@@ -1,7 +1,7 @@
 function handHandlerRaise() {
   this.setState((oldState) => {
     const myPlayer = oldState.playersData[this.myPlayerSeatId];
-    const minBet = 10;
+    const minBet = 50;
     if (myPlayer.bet.status !== 'fold' && myPlayer.money >= myPlayer.bet.value + minBet) {
       myPlayer.bet.value += minBet;
     }

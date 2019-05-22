@@ -1,9 +1,6 @@
-function connect() {
+function connect(connectionData) {
   const { host } = window.location;
   const ws = new WebSocket(`ws://${host}/login/`);
-  const connectionData = {
-    userName: 'Dima',
-  };
   ws.onopen = () => {
     ws.send(JSON.stringify(connectionData));
     ws.onmessage = ({ data }) => {
@@ -13,6 +10,7 @@ function connect() {
           sessionAccess: {
             connectionId: message.connectionId,
             userName: connectionData.userName,
+            money: connectionData.money,
           },
         });
       } else {

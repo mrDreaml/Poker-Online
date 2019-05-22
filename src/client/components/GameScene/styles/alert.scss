@@ -1,0 +1,27 @@
+.alert {
+    display: flex;
+    position: fixed;
+    border-radius: 5px;
+    box-shadow: 0px 0px 14px 5px rgba(0,0,0,.25);
+    background: #222;
+    padding: 25px;
+    min-width: 120px;
+    right: 10px;
+    top: 10px;
+    color: #DDD;
+
+    button {
+        position: absolute;
+        top: 3px;
+        right: 10px;
+        border: 0;
+        background: transparent;
+        width: 20px;
+        height: 20px;
+        font-size: 22px;
+        color: #E00;
+    }
+    span {
+        margin: auto;
+    }
+}

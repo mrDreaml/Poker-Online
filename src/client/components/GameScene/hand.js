@@ -20,7 +20,12 @@ const Hand = ({
             </div>
 
             <div className="container--myControls">
-              <div>
+              { handAction ? (
+                <HandTimer time={stepTime} />
+              ) : null}
+
+
+              <div className="container--my-state">
                 <span>{ `money: ${myPlayer.money}$` }</span>
                 <span>{ `bet: ${myPlayer.bet.value}$` }</span>
               </div>
@@ -30,10 +35,6 @@ const Hand = ({
                 <button onClick={handAction ? () => handAction.handHandlerAction('call') : null} type="button">Call</button>
                 <button onClick={handAction ? handAction.handHandlerRaise : null} type="button">Raise</button>
               </div>
-
-              { handAction ? (
-                <HandTimer time={stepTime} />
-              ) : null}
             </div>
           </section>
         )

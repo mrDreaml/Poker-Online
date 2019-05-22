@@ -24,7 +24,7 @@ const Table = ({
             player = playersData[step];
           }
 
-          if (player !== null) {
+          if (player !== null && player !== undefined) {
             const key = `playerSeat:${playerNumber + player.userName}`;
             return (
               <div key={key} className="playerSeat">

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 
+import { UncontrolledAlert as Alert } from 'reactstrap';
 import Hand from './hand';
 import Table from './table';
 
@@ -8,8 +8,10 @@ import prepareGameState from './entity/prepareGameState';
 import handHandlerRaise from './entity/handHandlerRaise';
 import handHandlerAction from './entity/handHandlerAction';
 
-import './gameScene.scss';
-
+import './styles/gameScene.scss';
+import './styles/alert.scss';
+import 'react-s-alert/dist/s-alert-default.css';
+import 'react-s-alert/dist/s-alert-css-effects/bouncyflip.css';
 
 class GameScene extends Component {
   constructor(props) {
@@ -19,6 +21,7 @@ class GameScene extends Component {
       currentStep: null,
       playersData: [],
       stepTime: null,
+      winMsg: null,
     };
 
     const inputState = props.location.state;
@@ -53,18 +56,27 @@ class GameScene extends Component {
   }
 
   render() {
-    const { playersData, currentStep, stepTime } = this.state;
+    const {
+      playersData, currentStep, stepTime, winMsg
+    } = this.state;
     const myPlayer = playersData[this.myPlayerSeatId];
     const isMyStep = this.myPlayerSeatId === currentStep && myPlayer.bet.status !== 'fold';
     const handAction = isMyStep ? {
       handHandlerRaise: this.handHandlerRaise,
       handHandlerAction: this.handHandlerAction,
     } : false;
+
     return (
       <section className="container--main">
+        {winMsg !== null ? (
+          <Alert color="info">
+            <span>{`${winMsg.winnerName} win: ${winMsg.value}`}</span>
+          </Alert>
+        ) : null }
         <Table {...this.state} myPlayerSeatId={this.myPlayerSeatId} />
         <Hand myPlayer={myPlayer} handAction={handAction} stepTime={stepTime} />
       </section>
+
     );
   }
 }

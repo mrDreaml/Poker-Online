@@ -8,11 +8,12 @@
 */
 
 const hash = require('object-hash');
+const getWinner = require('./PokerGameGetWinner');
 
 //  features  of  that  game
 const PokerCards = ['2C', '2D', '2H', '2S', '3C', '3D', '3H', '3S', '4C', '4D', '4H', '4S', '5C', '5D', '5H', '5S', '6C', '6D', '6H', '6S', '7C', '7D', '7H', '7S', '8C', '8D', '8H', '8S', '9C', '9D', '9H', '9S', '10C', '10D', '10H', '10S', 'AC', 'AD', 'AH', 'AS', 'JC', 'JD', 'JH', 'JS', 'KC', 'KD', 'KH', 'KS', 'QC', 'QD', 'QH', 'QS'];
 const PokerMaxTableCapacity = 5;
-
+const winMsgShowTime = 3000;
 
 class PokerGame {
   constructor(playersInit) {
@@ -21,8 +22,9 @@ class PokerGame {
     this.Deck = Object.assign([], PokerCards);
     this.step = 0;
     this.bank = 0;
-    this.stepTime = 6000;
+    this.stepTime = 15000;
     this.stepTimer = null;
+    this.winMsg = null;
 
     //  Getting Init  State Hash
     this.gameStateHashSum = hash({
@@ -151,6 +153,34 @@ class PokerGame {
       }
     }
 
+    const playerHandsData = this.players.reduce((accHands, player, i) => {
+      if (player) {
+        if (player.hand) {
+          accHands.realSequence.push(i);
+          accHands.hands.push(player.hand);
+          return accHands;
+        }
+      }
+      return accHands;
+    }, {
+      hands: [],
+      realSequence: [],
+    });
+    const winner = getWinner(this.table, playerHandsData.hands);
+    if (winner !== undefined) {
+      const winPlayer = this.players[playerHandsData.realSequence[winner.winerId]];
+      if (winPlayer) {
+        winPlayer.money += this.bank;
+        this.winMsg = {
+          value: winner.comboName,
+          winnerName: winPlayer.userName,
+        };
+        setTimeout(() => {
+          this.winMsg = null;
+        }, winMsgShowTime);
+      }
+    }
+
     this.initPlayers();
     this.cleanTable();
     this.cleanPlayersHands();
@@ -243,6 +273,7 @@ class PokerGame {
       playersData: this.players,
       currentStep: this.step,
       stepTime: this.stepTime,
+      winMsg: this.winMsg,
     });
   }
 

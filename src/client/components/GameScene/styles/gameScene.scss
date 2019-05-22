@@ -1,7 +1,12 @@
+h1, h2, h3, h4, h5, h6, span {
+  color: #eee;
+}
+
 .container--main {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  margin: auto;
   height: 100vh;
 }
 
@@ -9,24 +14,22 @@
   position: relative;
   display: flex;
   margin: 0 auto;
-  padding: 50px 100px;
+  padding: 0 100px;
 
   .container--table {
     display: flex;
     justify-content: center;
     margin: 0 auto;
-    padding: 80px;
+    height: 500px;
     width: 900px;
-    background: #090;
-    border-radius: 200px;
-    border: 5px solid #b39118;
+    background: url('../images/table.png');
 
     .card {
-      width: 150px;
-      height: 218px;
+      width: 100px;
+      height: 200px;
       box-shadow: 0 0 0 transparent;
       border-radius: 5px;
-      margin: 0 10px;
+      margin: auto 10px;
     }
   }
 
@@ -93,12 +96,12 @@
 .container--myCards {
   display: flex;
   justify-content: space-around;
-  width: 400px;
+  width: 286px;
   margin: 0 100px;
 
   .card {
-    width: 150px;
-    height: 218px;
+    width: 130px;
+    height: 200px;
     box-shadow: 0 0 0 transparent;
     border-radius: 5px;
   }
@@ -109,17 +112,38 @@
   display: flex;
   flex-direction: column;
 
+  .container--my-state {
+    margin-bottom: 45px;
+    display: flex;
+    flex-direction: column;
+    font-size: 25px;
+
+    span {
+      margin-bottom: 10px;
+    }
+  }
+
   .btns--controls button {
     margin: 0 10px;
     padding: 5px 15px;
     color: #eee;
     font-size: 2em;
-    background: #999;
+    background: #333;
     border-radius: 5px;
     border: none;
   }
   
   .btns--controls.active button {
-    background: #ff4a4a;
+    background: #ee4a4a;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .table {
+    padding: 0;
+  }
+  .container--table {
+    width: 100%;
+    height: calc(100vw / 1.8);
   }
 }

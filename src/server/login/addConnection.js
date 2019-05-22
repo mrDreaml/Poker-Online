@@ -1,8 +1,8 @@
-const addConnection = (connectedUser, newUser) => {
+const addConnection = (connectedUser, { userName, money }) => {
   const playerData = {
-    userName: newUser,
+    userName,
     id: connectedUser.length,
-    money: 100,
+    money,
     bet: { value: 0, status: 'none' }
   };
   if (connectedUser.length < connectedUser.maxSessionUser) {
