@@ -29,10 +29,3 @@ app.use(fallback('index.html', { root }));
 app.listen(process.env.PORT || port, () => {
   console.log(`Listening on port ${process.env.PORT || port}!`);
 });
-
-
-/* 
-  1.  Poker Combos Calculations
-  2. fix: after fold on end game winner don't get money
-  3.  login
-  */
