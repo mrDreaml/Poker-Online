@@ -6,10 +6,11 @@ const awaitingConnectionInterval = 2000;
 const ping = 60;
 
 const session = (app, connectedUser) => {
-  const Game = new PokerGame(connectedUser);
+  let Game;
   const timer = setInterval(() => {
     if (connectedUser.length > 1) {
       clearInterval(timer);
+      Game = new PokerGame(connectedUser);
       Game.start();
     }
   }, awaitingConnectionInterval);
@@ -24,16 +25,28 @@ const session = (app, connectedUser) => {
           const hashSum = Game.getHashSum;
           if (hashSum !== prevHashSum) {
             prevHashSum = hashSum;
+            const { gameState } = Game;
             ws.send(
               JSON.stringify(
-                prepareDataToSend(Game.gameState, connectionId, connectedUser.maxSessionUser)
+                prepareDataToSend({ ...gameState }, connectionId, connectedUser.maxSessionUser)
               )
             );
+            const { winMsg, playersData } = gameState;
+            if (winMsg !== null && playersData.length < connectedUser.length) {
+              Game.joinPlayers(connectedUser);
+            }
+            if (playersData.length > connectedUser.length) {
+              Game.removePlayers(connectedUser);
+            }
+            if (winMsg !== null) {
+              Game.newGame();
+            }
           }
         }
       } else if (ws.readyState === ws.CLOSED && !connectionBans.includes(connectionId)) {
+        // if disconnect
         connectionBans.push(connectionId);
-        connectedUser[connectionId] = null;
+        connectedUser.splice(connectionId, 1);
       }
     }, ping);
 

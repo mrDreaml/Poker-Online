@@ -1,10 +1,7 @@
 /*
-  Main  Poker Game  Logic There
-  At that class a lot of dependency
-  And it is directly related to the
-  session.
-  I DO NOT RECOMMEND CHANGING ANYTHING
-  HERE.
+  Author: mrDreaml
+  code review: 24.5.2019 mrDreaml v 1.0
+  remarks: need more comments
 */
 
 const hash = require('object-hash');
@@ -17,11 +14,12 @@ const winMsgShowTime = 3000;
 
 class PokerGame {
   constructor(playersInit) {
-    this.players = playersInit;
+    this.players = [...playersInit];
     this.table = [];
-    this.Deck = Object.assign([], PokerCards);
+    this.Deck = [...PokerCards];
     this.step = 0;
     this.bank = 0;
+    this.maxBet = 0;
     this.stepTime = 15000;
     this.stepTimer = null;
     this.winMsg = null;
@@ -29,146 +27,70 @@ class PokerGame {
     //  Getting Init  State Hash
     this.gameStateHashSum = hash({
       table: this.table,
-      players: this.players,
+      playersData: this.players,
       step: this.step,
       stepTime: this.stepTime,
+      winMsg: this.winMsg,
     }, { algorithm: 'md5', encoding: 'base64' });
   }
 
-  // ------------------
-  // cleaning methods
 
-
-  cleanTable() {
-    this.table.length = 0;
-  }
-
-  cleanBank() {
-    this.bank = 0;
-  }
-
-  cleanPlayersHands() {
-    this.players.map((player) => {
-      if (player) {
-        if (player.hand) {
-          const newPlayer = Object.assign({}, player);
-          newPlayer.hand.length = 0;
-          return newPlayer;
-        }
-      }
-      return player;
-    });
-  }
-
-
-  // ------------------
-  // restore&init methods
-
-  restoreDeck() {
-    this.Deck = Object.assign([], PokerCards);
-  }
-
-
-  initPlayers() {
+  newGame() {
     const minBet = 10;
-    this.players.forEach((player) => {
-      if (player) {
-        if (player.money > minBet) {
-          player.money -= minBet;
-          player.bet.status = 'call';
-          player.bet.value = minBet;
-        } else {
-          player.bet.status = 'fold';
-        }
+    this.table.length = 0;
+    this.Deck = [...PokerCards];
+    this.bank = 0;
+    this.players = this.players.reduce((updatedPlayers, player) => {
+      const newPlayer = { ...player };
+      const getRandomCardFromDeck = () => this.Deck.splice(Math.floor(Math.random() * this.Deck.length), 1)[0];
+      newPlayer.hand = [getRandomCardFromDeck(), getRandomCardFromDeck()];
+      if (player.money > minBet) {
+        newPlayer.bet.status = 'call';
+        newPlayer.bet.value = minBet;
+      } else {
+        newPlayer.bet.status = 'fold';
       }
-    });
+      return updatedPlayers.concat(newPlayer);
+    }, []);
   }
 
-  // ------------------
-  // other methods
-  calculateMaxBet() {
-    return this.players.reduce((maxBet, player) => {
-      if (player) {
-        if (player.bet.value > maxBet) {
-          return player.bet.value;
-        }
-      }
-      return maxBet;
-    }, 0);
+
+  joinPlayers(connectedPlayers) {
+    this.players = this.players.concat(connectedPlayers.filter(player => this.players.findIndex(p => player.id === p.id) === -1));
   }
+
+
+  removePlayers(connectedPlayers) {
+    this.players = this.players.filter(player => connectedPlayers.findIndex(cP => player.id === cP.id) !== -1);
+  }
+
 
   startStepTimer() {
     this.stepTimer = setTimeout(() => {
       const myPlayer = this.players[this.step];
-      if (myPlayer) {
-        if (myPlayer.bet.value === this.calculateMaxBet() && myPlayer.bet.status === 'call') {
-          myPlayer.bet.status = 'check';
-        } else {
-          myPlayer.bet.status = 'fold';
-        }
+      if (myPlayer.bet.value === this.maxBet && myPlayer.bet.status === 'call') {
+        myPlayer.bet.status = 'check';
+      } else {
+        myPlayer.bet.status = 'fold';
       }
       this.nextStep();
     }, this.stepTime);
   }
 
-  calculateCurrentBet() {
-    const maxBet = this.calculateMaxBet();
-    this.players.map((player) => {
-      if (player) {
-        if (player.bet.status !== 'fold') {
-          const { money } = player;
-          if (money < maxBet) {
-            player.bet.value = money;
-          } else {
-            player.bet.value = maxBet;
-          }
-        }
-      }
-      return player;
-    });
-  }
-
-  isEndGameByLastPlayer() {
-    return this.players.reduce((sum, player) => {
-      if (player) {
-        if (player.bet.status === 'call' || player.bet.status === 'check') {
-          return sum + 1;
-        }
-      }
-      return sum;
-    }, 0) <= 1;
-  }
 
   endGameCalculation(type) {
-    // end game money calculation
     if (type === 'lastPlayer') {
-      const lastPlayerId = this.players.findIndex((player) => {
-        if (player) {
-          return player.bet.status === 'call';
-        } return false;
-      });
+      const lastPlayerId = this.players.findIndex(player => player.bet.status === 'call');
       if (lastPlayerId !== -1) {
         const lastPlayer = this.players[lastPlayerId];
         lastPlayer.money += this.bank;
       }
     }
 
-    const playerHandsData = this.players.reduce((accHands, player, i) => {
-      if (player) {
-        if (player.hand) {
-          accHands.realSequence.push(i);
-          accHands.hands.push(player.hand);
-          return accHands;
-        }
-      }
-      return accHands;
-    }, {
-      hands: [],
-      realSequence: [],
-    });
-    const winner = getWinner(this.table, playerHandsData.hands);
+    const playerHands = this.players.reduce((accHands, player) => accHands.concat([player.hand]), []);
+    const winner = getWinner(this.table, playerHands);
     if (winner !== undefined) {
-      const winPlayer = this.players[playerHandsData.realSequence[winner.winerId]];
+      const winPlayer = this.players[winner.winerId];
       if (winPlayer) {
         winPlayer.money += this.bank;
         this.winMsg = {
@@ -180,17 +102,12 @@ class PokerGame {
         }, winMsgShowTime);
       }
     }
-
-    this.initPlayers();
-    this.cleanTable();
-    this.cleanPlayersHands();
-    this.restoreDeck();
-    this.distribution();
-    this.cleanBank();
   }
+
 
   nextStep() {
     this.gameStateHashSum = hash(this.gameState, { algorithm: 'md5', encoding: 'base64' });
+
     clearTimeout(this.stepTimer);
     this.startStepTimer();
 
@@ -211,7 +128,13 @@ class PokerGame {
       }
 
       // new circle
-      if (this.isEndGameByLastPlayer()) {
+
+      if (this.players.reduce((sum, player) => {
+        if (player.bet.status === 'call' || player.bet.status === 'check') {
+          return sum + 1;
+        }
+        return sum;
+      }, 0) <= 1) {
         this.endGameCalculation('lastPlayer');
       }
 
@@ -220,39 +143,40 @@ class PokerGame {
     return this.step;
   }
 
+
   playerEvent(event, playerId) {
     if (event.type === 'call') {
       this.players[playerId].bet.value = event.value;
       this.players[playerId].money -= event.value;
       this.bank += event.value;
-      this.calculateCurrentBet();
+      this.maxBet = this.players.reduce((maxBet, player) => {
+        if (player.bet.value > maxBet) {
+          return player.bet.value;
+        }
+        return maxBet;
+      }, 0);
+      this.players = this.players.reduce((updatedPlayers, player) => {
+        const newPlayer = { ...player };
+        if (player.bet.status !== 'fold') {
+          const { money } = player;
+          if (money < this.maxBet) {
+            newPlayer.bet.value = money;
+          } else {
+            newPlayer.bet.value = this.maxBet;
+          }
+        }
+        return updatedPlayers.concat(newPlayer);
+      }, []);
     }
     this.players[playerId].bet.status = event.type;
     this.nextStep();
   }
 
+
   start() {
-    this.distribution();
+    this.newGame();
     this.startStepTimer();
-    this.initPlayers();
     this.gameStateHashSum = hash(this.gameState, { algorithm: 'md5', encoding: 'base64' });
-  }
-
-
-  // ------------------
-  // distribution methods
-
-
-  distribution() {
-    this.players.map((player) => {
-      if (player) {
-        const firstCard = this.Deck.splice(Math.floor(Math.random() * this.Deck.length), 1)[0];
-        const nextCard = this.Deck.splice(Math.floor(Math.random() * this.Deck.length), 1)[0];
-        return Object.assign(player, {
-          hand: [firstCard, nextCard],
-        });
-      } return player;
-    });
   }
 
 
@@ -261,10 +185,6 @@ class PokerGame {
       this.table.push(this.Deck.splice(Math.floor(Math.random() * this.Deck.length), 1)[0]);
     }
   }
-
-
-  // ------------------
-  // Get methods
 
 
   get gameState() {
