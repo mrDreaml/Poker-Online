@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Route, BrowserRouter, Switch, Redirect,
+  Route, BrowserRouter, Switch,
 } from 'react-router-dom';
 import {
   GameScene, Login

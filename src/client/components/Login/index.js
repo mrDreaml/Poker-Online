@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Redirect } from 'react-router-dom';
 import Connect from './connect';
 
-import './login.scss';
+import './index.scss';
 
 class Login extends Component {
   constructor(props) {
